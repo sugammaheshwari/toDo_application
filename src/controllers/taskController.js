@@ -16,12 +16,23 @@ const createTask = async (req, res) => {
 // 📌 Get All Tasks
 const getTasks = async (req, res) => {
     try {
-        const tasks = await Task.find({ userId: req.user.id });
+        const { status } = req.query;  // Get the query parameter
+        const filter = { userId: req.user.id };  // Fetch tasks only for the logged-in user
+
+        // Apply filtering if 'status' is provided
+        if (status === "completed") {
+            filter.completed = true;
+        } else if (status === "pending") {
+            filter.completed = false;
+        }
+
+        const tasks = await Task.find(filter);
         res.json(tasks);
     } catch (error) {
-        res.status(500).json({ error: "Error fetching tasks" });
+        res.status(500).json({ error: "Error retrieving tasks" });
     }
 };
+
 
 // 📌 Get a Single Task by ID
 const getTask = async (req, res) => {
